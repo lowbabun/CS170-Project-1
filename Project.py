@@ -7,26 +7,12 @@ def euclid_distance(state, goal, col):
   sum = 0
   for i , tile in enumerate(state): 
     if tile != 0:#no need to calcualte blank square
-      x_state, y_state = (i)%col, (i)//col #convert 1d to 2d
+      x_state, y_state = (i)%col, (i)//col #convert 1d to 2d to calculate d = sqrt((x2-x1)^2 + (y2-y1)^2)
       x_goal, y_goal = (tile -1) %col, (tile-1) //col
       sum += math.sqrt((x_goal - x_state)**2 + (y_goal-y_state)**2)
   return sum
 
 
-def back_track(end):
-  curr = (end, '')
-  print_stack = []
-  while curr is not None:
-    print_stack.append(curr[1])
-    print_stack.append(curr[0])
-    curr = curr[0].get_path()
-  
-  while len(print_stack) != 0:
-    element = print_stack.pop()
-    if isinstance(element, str):
-      print(element)
-    else:
-      element.state_print()
 
 class Node(object):
   def __init__(self, state, distance, goal_state, func, size): #set up initials
@@ -137,7 +123,7 @@ def answer(h_function, initial, size):
   while True:
     if(len(frontier) == 0):
       print("invalid")
-      return (expand_cnt, max_queue_size, depth)
+      return (expand_cnt, max_queue_size, depth, None)
     
     _, _, curr_state = heapq.heappop(frontier) #only keep curr_state part
 
@@ -158,7 +144,7 @@ def answer(h_function, initial, size):
         depth = path.get_depth()
         print("GOALLLLLL!!")
         path.state_print()
-        return(expand_cnt, max_queue_size, depth)
+        return(expand_cnt, max_queue_size, depth, path)
       
 
     #mark curr_state as visisted
@@ -172,12 +158,28 @@ def answer(h_function, initial, size):
     
     max_queue_size = max(max_queue_size, len(frontier))
 
+def back_track(end): #backtrack from goal to start
+  curr = (end, '')#set the goal node
+  print_stack = []
+  while curr is not None:#traverse back to the start - get the parent
+    print_stack.append(curr[1])
+    print_stack.append(curr[0])
+    curr = curr[0].get_path()
+  
+  while len(print_stack) != 0:
+    element = print_stack.pop()
+    if isinstance(element, str): #if it's a move
+      print(element) #print the move
+    else:#it's a node
+      element.state_print() #print the state
+
 
 def main():
   choice = int (input("Welcome to chsu115 and rjour001 8 puzzle solver. Type “1” to use a default puzzle, or “2” to enter your own puzzle: "))
-  puzzle_size = 3
+  puzzle_size = 3 #if we want to change the size of puzzle, just change this value
   init_state = [1,0,3,4,2,6,7,5,8]
-  if choice == 2:
+  if choice == 2: #user input
+    init_state = [] #reset initial state
     for i in range (puzzle_size):
       values = None 
       if (i+1) %10 == 1: #making the rows
@@ -197,10 +199,10 @@ def main():
   #store the state as array with size 1 * w and 1d
   choice = int(input())
 
-  #lambda functions
+  #lambda functions to set up heuristics
   zero_h = lambda state, goal, colums = None:0 
   misplaced_h = lambda state, goal, colums = None:sum(1 for i , tile in enumerate(state) if  tile != goal [i] and tile != 0)
-  euclid_h = lambda state, goal, colums: euclid_distance(state, goal, colums)
+  euclid_h = lambda state, goal, colums: euclid_distance(state, goal, colums) #don't need goal since it's always the same
 
   rst = None
   if choice == 1:
@@ -210,11 +212,16 @@ def main():
   else:
     rst = euclid_h
 
-  expanded, max_queue, depth = answer(rst, init_state, puzzle_size)
+  expanded, max_queue, depth, goal_node = answer(rst, init_state, puzzle_size)
 
   print(f"To solve this problem the search algorithm expanded a total of {expanded} nodes.\n")
   print("The maximum number of nodes in the queue at any one time: ", max_queue)
   print("The depth of the goal node was: ", depth)
+
+  print("Backtrack") #extra credit
+  print("一一一一一一一一一一一一一一一一一")
+  if goal_node is not None:
+    back_track(goal_node)
 
 
 main()
