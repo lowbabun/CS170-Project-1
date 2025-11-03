@@ -1,4 +1,5 @@
 import heapq
+import time
 import math
 from itertools import count
 
@@ -100,7 +101,7 @@ class Node(object):
     return self.disatant_from_start
 
   def h_n(self):
-    return self.heuristic
+    return int(self.heuristic)
 
 def answer(h_function, initial, size):
   max_queue_size = 0
@@ -117,7 +118,7 @@ def answer(h_function, initial, size):
   if (goal_state == initial):
     print("It's already a correct answer")
   counter = count()
-
+  h_function
   init_node = Node(initial, 0, goal_state, h_function, size)
   heapq.heappush(frontier, (init_node.fg_sum(), next(counter), init_node))
   while True:
@@ -156,7 +157,7 @@ def answer(h_function, initial, size):
       if path not in visited and all(path!= node[2] for node in frontier):
         heapq.heappush(frontier, (path.fg_sum(), next(counter), path))
     
-    max_queue_size = max(max_queue_size, len(frontier))
+    max_queue_size = max(max_queue_size, len(frontier))  
 
 def back_track(end): #backtrack from goal to start
   curr = (end, '')#set the goal node
@@ -196,7 +197,7 @@ def main():
           "1) Uniform Cost Search\n"
           "2) A* with the Misplaced Tile heuristic.\n"
           "3) A* with the Euclidean distance heuristic.\n")
-  #store the state as array with size 1 * w and 1d
+  #store the state as array with size 1 * w
   choice = int(input())
 
   #lambda functions to set up heuristics
@@ -211,12 +212,13 @@ def main():
     rst = misplaced_h
   else:
     rst = euclid_h
-
+  start_time = time.time()
   expanded, max_queue, depth, goal_node = answer(rst, init_state, puzzle_size)
-
+  end_time = time.time()
   print(f"To solve this problem the search algorithm expanded a total of {expanded} nodes.\n")
   print("The maximum number of nodes in the queue at any one time: ", max_queue)
   print("The depth of the goal node was: ", depth)
+  print(f"Runtime: {end_time - start_time:.4f} seconds")
 
   print("Backtrack") #extra credit
   print("一一一一一一一一一一一一一一一一一")
