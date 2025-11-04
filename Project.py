@@ -117,8 +117,8 @@ def answer(h_function, initial, size):
 
   if (goal_state == initial):
     print("It's already a correct answer")
+    return (expand_cnt, max_queue_size, depth, None)
   counter = count()
-  h_function
   init_node = Node(initial, 0, goal_state, h_function, size)
   heapq.heappush(frontier, (init_node.fg_sum(), next(counter), init_node))
   while True:
@@ -157,14 +157,14 @@ def answer(h_function, initial, size):
       if path not in visited and all(path!= node[2] for node in frontier):
         heapq.heappush(frontier, (path.fg_sum(), next(counter), path))
     
-    max_queue_size = max(max_queue_size, len(frontier))  
+    max_queue_size = max(max_queue_size, len(frontier))
 
 def back_track(end): #backtrack from goal to start
   curr = (end, '')#set the goal node
   print_stack = []
   while curr is not None:#traverse back to the start - get the parent
-    print_stack.append(curr[1])
-    print_stack.append(curr[0])
+    print_stack.append(curr[1]) #store the move
+    print_stack.append(curr[0]) #store the node
     curr = curr[0].get_path()
   
   while len(print_stack) != 0:
@@ -180,17 +180,18 @@ def main():
   puzzle_size = 3 #if we want to change the size of puzzle, just change this value
   init_state = [1,0,3,4,2,6,7,5,8]
   if choice == 2: #user input
+    print("Enter your puzzle, use a zero to represent the blank")
     init_state = [] #reset initial state
     for i in range (puzzle_size):
       values = None 
       if (i+1) %10 == 1: #making the rows
-        values = input(f"Enter the {i+1}st row: ").split()
+        values = input(f"Enter the {i+1}st row, use space or tabs between numbers: ").split()
       elif (i+1)%10 ==2:
-        values = input(f"Enter the {i+1}st row: ").split()
+        values = input(f"Enter the {i+1}st row, use space or tabs between numbers: ").split()
       elif (i+1) %10 == 3:
-        values = input(f"Enter the {i+1}st row: ").split()
+        values = input(f"Enter the {i+1}st row, use space or tabs between numbers: ").split()
       else:
-        values = input(f"Enter the {i+1}st row: ").split()
+        values = input(f"Enter the {i+1}st row, use space or tabs between numbers: ").split()
       row = [int(num) for num in values]
       init_state.extend(item for item in row)
   print("Enter your choice of algorithm \n"
@@ -218,11 +219,11 @@ def main():
   print(f"To solve this problem the search algorithm expanded a total of {expanded} nodes.\n")
   print("The maximum number of nodes in the queue at any one time: ", max_queue)
   print("The depth of the goal node was: ", depth)
-  print(f"Runtime: {end_time - start_time:.4f} seconds")
+  print(f"Runtime: {end_time - start_time:.5f} seconds")
 
-  print("Backtrack") #extra credit
-  print("一一一一一一一一一一一一一一一一一")
   if goal_node is not None:
+    print("Backtrack") #extra credit
+    print("一一一一一一一一一一一一一一一一一")
     back_track(goal_node)
 
 
